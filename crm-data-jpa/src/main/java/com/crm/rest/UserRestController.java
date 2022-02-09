@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crm.custom_exceptions.UserNotFoundException;
 import com.crm.entities.User;
 import com.crm.service.UserService;
 
@@ -29,9 +30,12 @@ public class UserRestController {
 	
 	@GetMapping("/users/{id}")
 	public User getUser(@PathVariable int id) {
+		if(id<0) {
+			throw new UserNotFoundException("User with this id not found: " + id);
+		}
 		User user = userService.findById(id);
 		if(user == null) {
-			throw new RuntimeException("User not found: " + id);
+			throw new UserNotFoundException("User with this id not found: " + id);
 		}
 		return user;
 	}
@@ -53,7 +57,7 @@ public class UserRestController {
 	public String deleteUser(@PathVariable int id) {
 		User tempUser = userService.findById(id);
 		if(tempUser == null) {
-			throw new RuntimeException("User id not found: " + id);
+			throw new UserNotFoundException("User with this id not found: " + id);
 		}
 		userService.deleteById(id);
 		return "Deleted user id: " + id;
